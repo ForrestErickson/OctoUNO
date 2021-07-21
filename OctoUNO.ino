@@ -7,31 +7,30 @@
    Date: 20210720  Happy Moon Landing Annaversary
    Lisense: Dedicated to the public domain.
    Free to use. This program is designed to kill you but not guarenteed to do so.
-
+   Date: 20210721 Rework circuits per note book Start 2013 Page 79.
 */
 
 /*  An Ocotpus curve tracers sorces and sinks current into a single port and plots the IV curve.
     If the DUT is and IC we are typicaly typicaly interested in probing the ESD input protection diodes.
     We typicaly test the device unpowered with VCC shorted to VSS (GND) and we probed with a postive and negative current limited voltage ramps.
 
-    For the OcotUNO Ttis will be done with done using two PWM outputs connected to drive the VCC and VSS nodes push pull.
-
+    For the OcotUNO This will be done with done using one PWM output filtered and double buffered to make Vtest.
+    The DUT will be tested by connecting from the Vtest into a theven source at Vcc/2 with Req =10K/2
+    
    Pinout
-   A0 to ICPin under test
-   VssTest, Pin ~5  will be PWM0 to test D2
-   A1 to IC Vss and Vcc
-   VccTest Pin ~6  will be PWM1 to test D1
+   Vtest from WPM on Pin 5.
+   A0 to ICPin under test at Vtest
+   A1 to ICPin under test at Vthev
 
-   RESULES: The schematic on labratory note book Start 2013 page 76-78 but not working /  too complex.
+   RESULES: The ramp voltage is from 1 to about 4.6 Volts. Ramp time is about 250mS.
 */
 
-int VssTest = 5;
-int VccTest = 6;
+int VccTest = 5;
 const int MAXPWM = 255;
-
+const int STEPSIZE = 1;
+int ii = 511; 
+  
 //Set LED for Uno or ESP32 Dev Kit on board blue LED.
-//const int LED_BUILTIN = 2;    // ESP32 Kit
-//const int LED_BUILTIN = 13;    //Not really needed for Arduino UNO it is defined in library
 const int HIGH_TIME_LED = 900;
 const int LOW_TIME_LED = 100;
 long lastLEDtime = 0;
@@ -55,33 +54,27 @@ void setup() {
   // put your setup code here, to run once:
   pinMode(LED_BUILTIN, OUTPUT);      // set the LED pin mode
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level) Start of setup()
-    // initialize serial communication at 9600 bits per second:
   Serial.begin(115200);
   
-  
-  //Set both drive pins to low and to output.
-//digitalWrite(VssTest, LOW);
-//  digitalWrite(VccTest, LOW);
-  pinMode(VssTest, OUTPUT);
-  pinMode(VccTest, OUTPUT);
-  digitalWrite(VssTest, LOW);
-  
+  //Set PWM drive pins to output.
+  pinMode(VccTest, OUTPUT); 
+  analogWrite(VccTest, 127);  //Set to mid point
   digitalWrite(LED_BUILTIN, LOW);   // end of setup()  
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
   wink();
-  Serial.println(analogRead(A0));
-  
-  //Ramp VssTest
-  //for (int i = 0; i<<MAXPWM; i++){
-  for (int ii = 0; ii <=255; ii++){
-    //Serial.println(analogRead(A0));
+
+  //Curve Trace. Measure A0, A1
+  //Calculate Vdut and Idut
+
+  //Ramp VccTest
     Serial.println(ii);
-    analogWrite(VssTest, ii);
-    delay(10);   
-  }//Ramp VssTest
-  
+    analogWrite(VccTest, ii);
+    ii = ii + STEPSIZE;
+    if (ii > MAXPWM){
+      ii = 0;
+    }
+    delay(1);     //One millisecond
 }//Loop
