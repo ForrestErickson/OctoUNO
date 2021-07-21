@@ -21,11 +21,13 @@
    VssTest, Pin ~5  will be PWM0 to test D2
    A1 to IC Vss and Vcc
    VccTest Pin ~6  will be PWM1 to test D1
+
+   RESULES: The schematic on labratory note book Start 2013 page 76-78 but not working /  too complex.
 */
 
 int VssTest = 5;
 int VccTest = 6;
-
+const int MAXPWM = 255;
 
 //Set LED for Uno or ESP32 Dev Kit on board blue LED.
 //const int LED_BUILTIN = 2;    // ESP32 Kit
@@ -35,24 +37,7 @@ const int LOW_TIME_LED = 100;
 long lastLEDtime = 0;
 long nextLEDchange = 100; //time in ms.
 
-
-void setup() {
-  // put your setup code here, to run once:
-  pinMode(LED_BUILTIN, OUTPUT);      // set the LED pin mode
-  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level) Start of setup()
-  
-  //Set both drive pins to low and to output.
-  digitalWrite(VssTest, LOW);
-  digitalWrite(VccTest, LOW);
-  pinMode(VssTest, OUTPUT);
-  pinMode(VccTest, OUTPUT);
-  
-  digitalWrite(LED_BUILTIN, LOW);   // end of setup()  
-}
-
-void loop() {
-  // put your main code here, to run repeatedly:
-
+void wink(){
     //Wink the LED
   if (((millis() - lastLEDtime) > nextLEDchange)||(millis()< lastLEDtime)) {
     if (digitalRead(LED_BUILTIN) == LOW) {
@@ -66,3 +51,37 @@ void loop() {
   }//end LED wink
 
 }
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(LED_BUILTIN, OUTPUT);      // set the LED pin mode
+  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level) Start of setup()
+    // initialize serial communication at 9600 bits per second:
+  Serial.begin(115200);
+  
+  
+  //Set both drive pins to low and to output.
+//digitalWrite(VssTest, LOW);
+//  digitalWrite(VccTest, LOW);
+  pinMode(VssTest, OUTPUT);
+  pinMode(VccTest, OUTPUT);
+  digitalWrite(VssTest, LOW);
+  
+  digitalWrite(LED_BUILTIN, LOW);   // end of setup()  
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+  wink();
+  Serial.println(analogRead(A0));
+  
+  //Ramp VssTest
+  //for (int i = 0; i<<MAXPWM; i++){
+  for (int ii = 0; ii <=255; ii++){
+    //Serial.println(analogRead(A0));
+    Serial.println(ii);
+    analogWrite(VssTest, ii);
+    delay(10);   
+  }//Ramp VssTest
+  
+}//Loop
