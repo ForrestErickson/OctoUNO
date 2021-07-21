@@ -7,7 +7,7 @@
    Date: 20210720  Happy Moon Landing Annaversary
    License: Dedicated to the public domain.
    Free to use. This program is designed to kill you but not guarenteed to do so.
-   Date: 20210721 Rework circuits per note book Start 2013 Page 79.
+   Date: 20210721 Rework circuits per note book Start 2013 Page 79 and then page 81.
 */
 
 /*  An Ocotpus curve tracers sorces and sinks current into a single port and plots the IV curve.
@@ -24,7 +24,7 @@
 
    The current in the DUT is about 1uA per setup size from 1023/2
 
-   RESULES: The ramp voltage is from 1 to about 4.6 Volts. Ramp time is about 250mS.
+   RESULES: The ramp voltage is from 1 to about 4.6 Volts. Ramp time is about 210mS when delay is 300uS.
 */
 
 int VccTest = 5;    //Use PWM output 5, 980Hz.
@@ -59,9 +59,10 @@ void wink() {
 }
 void setup() {
   // put your setup code here, to run once:
+  Serial.begin(1000000);
+
   pinMode(LED_BUILTIN, OUTPUT);      // set the LED pin mode
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level) Start of setup()
-  Serial.begin(115200);
 
   //Set PWM drive pins to output.
   pinMode(VccTest, OUTPUT);
@@ -93,6 +94,7 @@ void loop() {
   if (ii > MAXPWM) {
     ii = 0;
   }
-  delay(1);     //One millisecond
+  delayMicroseconds(300);     // This makes a display good for oscilliscope.
+//  delayMicroseconds(2000);     // Sweep on Display is notacibly slow.
   
 }//Loop
