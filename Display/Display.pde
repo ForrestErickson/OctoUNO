@@ -12,8 +12,15 @@ int lf = 10;    // Linefeed in ASCII
 String myString = null;
 Serial myPort;  // The serial port
 
+  int myWidth = 600;
+  int myHeight = 600;
 color myBackground = color(0, 0, 0);  //Start out black.
 boolean gotKey = false;
+
+PFont f;                          // Declare regular body text PFont variable
+PFont fBig;                          // Declare heading PFont variable
+PFont fFoot;                          // Declare heading PFont variable
+
 
 void setup() {
   // List all the available serial ports
@@ -26,8 +33,12 @@ void setup() {
   myString = myPort.readStringUntil(lf);
   myString = null;
   
-  //Display setup. The Arduino ADC has a range of 1023 split in half for the measurements.
+  //Display setup. The Arduino ADC has a range of 1023 split in half for the measurements. 
   size(600, 600);
+  f = createFont("Arial", 15, true);     // Create Font 
+  fBig = createFont("Arial", 20, true);     // Create Font for heading 
+  fFoot = createFont("Arial", 10, true);     // Create Font for heading 
+
   stroke(153);
   background(myBackground);
 
@@ -36,6 +47,7 @@ void setup() {
 //Gather measurements of V and I from the Arduino serial port and plot same. 
 void draw() {
   menuDisplay();
+  axisDraw();
   while ( (myPort.available() > 0)) {
     myString = myPort.readStringUntil(lf);
     if (myString != null) {
@@ -77,9 +89,24 @@ void keyPressed() {
 
 
 void menuDisplay(){
-  textSize(20);
+  
+  textFont(fBig);
   text("OctoUNO", 30, 20);
-  textSize(16);
+  textFont(f);
   text("Escape to exit", 30, 40);
   text("Any Key to erase", 30, 60);
+  textFont(fFoot);
+  text("By Forrest Erickson, Amused Scientist", 310, 590);
+}
+
+void axisDraw(){
+   pushMatrix();
+  // draw graph -- center on origin
+  translate(myWidth/2, myHeight/2);
+  stroke(255);
+  // draw axes
+  line(-myWidth,0,myWidth,0);
+  line(0,-myHeight,0,myHeight);
+  stroke(127);
+  popMatrix(); 
 }
