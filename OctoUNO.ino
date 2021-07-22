@@ -1,7 +1,8 @@
 /*OctoUNO
    A progam for an Arduino Uno
-   Makes Uno into an elementary curve tracer like an Ocotpus
-   Useful for checking incircuit semiconductors and more.
+   Makes UNO into an elementary curve tracer like an Ocotpus
+   DISPLAY IV plot on PC with Proccessing.
+   Useful for checking in circuit semiconductors and more.
 
    Author: Forrest L Erickson
    Date: 20210720  Happy Moon Landing Annaversary
@@ -10,12 +11,12 @@
    Date: 20210721 Rework circuits per note book Start 2013 Page 79 and then page 81.
 */
 
-/*  An Ocotpus curve tracers sorces and sinks current into a single port and plots the IV curve.
+/*  An Ocotpus curve tracers sources and sinks current into a single port and plots the IV curve.
     If the DUT is and IC we are typicaly typicaly interested in probing the ESD input protection diodes.
-    We typicaly test the device unpowered with VCC shorted to VSS (GND) and we probed with a postive and negative current limited voltage ramps.
+    We typically test the device unpowered with VCC shorted to VSS (GND) and we probed with a positive and negative current limited voltage ramps.
 
     For the OcotUNO This will be done with done using one PWM output filtered and double buffered to make Vtest.
-    The DUT will be tested by connecting from the Vtest into a theven source at Vcc/2 with Req =10K/2
+    The DUT will be tested by connecting from the Vtest into a Theven source at Vcc/2 with RThev = Req =10K/2
 
    Pinout
    Vtest from WPM on Pin 5.
@@ -24,7 +25,7 @@
 
    The current in the DUT is about 1uA per setup size from 1023/2
 
-   RESULES: The ramp voltage is from 1 to about 4.6 Volts. Ramp time is about 210mS when delay is 300uS.
+   RESULTS: The ramp voltage is from 1 to about 4.6 Volts. Ramp time is about 210mS when delay is 300uS.
 */
 
 int VccTest = 5;    //Use PWM output 5, 980Hz.

@@ -3,7 +3,7 @@
  * Date: 20210721
  Based on a serial example by Tom Igoe
  License: Dedicated to the public domain.
- Free to use. This program is designed to kill you but not guarenteed to do so.
+ Free to use. This program is designed to kill you but not guaranteed to do so.
  */
 
 import processing.serial.*;
@@ -20,8 +20,7 @@ boolean gotKey = false;
 
 PFont f;                          // Declare regular body text PFont variable
 PFont fBig;                          // Declare heading PFont variable
-PFont fFoot;                          // Declare heading PFont variable
-
+PFont fFoot;                          // Declare footer PFont variable
 
 void setup() {
   // List all the available serial ports
@@ -86,7 +85,6 @@ void keyPressed() {
   }
   gotKey = true;
 }//keyPressed()
-
 
 void menuDisplay() {  
   textFont(fBig);
