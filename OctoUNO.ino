@@ -29,13 +29,14 @@
 */
 
 int VccTest = 5;    //Use PWM output 5, 980Hz.
+const int BUTTON_CAPTURE = 2;   // Button to GND.
 const int VCC = 5;  //Volts
 const int REQ = 5000;   //REQ is the Rthevenin of 10K // 10K
 const int MAXPWM = 255;
 const int STEPSIZE = 1;
 int ii = MAXPWM / 2; // Mid point
 int Vdut = 0;
-int Idut =0; 
+int Idut = 0;
 
 
 //Set LED for Uno or ESP32 Dev Kit on board blue LED.
@@ -55,12 +56,41 @@ void wink() {
       nextLEDchange = LOW_TIME_LED;
     }
     lastLEDtime = millis();
-  }//end LED wink
+  }
+}//end LED wink
+void captureOctopus() {
 
-}
+  //Curve Trace. Measure A0, A1
+  //Calculate Vdut and Idut
+  int VdutPlus = analogRead(A0);
+  int VdutMinus = analogRead(A1);
+  Vdut = VdutPlus - VdutMinus;
+  Idut = (VdutMinus - 512); //uAmps
+
+  //  Serial.print(VdutPlus);
+  Serial.print(Vdut);
+  Serial.print(", ");
+  Serial.println(Idut);
+  //  Serial.println(Idut-Vdut);
+
+  //Ramp VccTest
+  //Serial.println(ii);
+  analogWrite(VccTest, ii);
+  ii = ii + STEPSIZE;
+  if (ii > MAXPWM) {
+    ii = 0;
+  }
+  delayMicroseconds(300);     // This makes a display good for oscilliscope.
+  //  delayMicroseconds(2000);     // Sweep on Display is notacibly slow.
+
+
+}//captureOcotpus
+
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(1000000);
+  pinMode(BUTTON_CAPTURE, INPUT_PULLUP);      // set
 
   pinMode(LED_BUILTIN, OUTPUT);      // set the LED pin mode
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level) Start of setup()
@@ -75,27 +105,8 @@ void loop() {
   // put your main code here, to run repeatedly:
   wink();
 
-  //Curve Trace. Measure A0, A1
-  //Calculate Vdut and Idut
-  int VdutPlus = analogRead(A0);
-  int VdutMinus = analogRead(A1);
-  Vdut = VdutPlus-VdutMinus;
-  Idut = (VdutMinus- 512);  //uAmps
- 
-//  Serial.print(VdutPlus);
-  Serial.print(Vdut);
-  Serial.print(", ");
-  Serial.println(Idut);
-//  Serial.println(Idut-Vdut);
-
-  //Ramp VccTest
-  //Serial.println(ii);
-  analogWrite(VccTest, ii);
-  ii = ii + STEPSIZE;
-  if (ii > MAXPWM) {
-    ii = 0;
+  if (!digitalRead(BUTTON_CAPTURE)) {    
+    captureOctopus();
   }
-  delayMicroseconds(300);     // This makes a display good for oscilliscope.
-//  delayMicroseconds(2000);     // Sweep on Display is notacibly slow.
-  
+
 }//Loop
