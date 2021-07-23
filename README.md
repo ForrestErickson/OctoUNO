@@ -18,4 +18,6 @@ Screen shot of display
 Schematic  
 ![SCHEMATIC](/SchematicLabNoteBook81.png)
 
+Breadboard  
+![Breadboard](/OctoUnoBreadboard.jpg)
 
