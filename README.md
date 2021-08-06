@@ -13,8 +13,9 @@ See; https://github.com/ForrestErickson/OctoUNO_Product
    Free to use. This program is designed to kill you but not guaranteed to do so.   
    Date: 20210721 Rework circuits per note book Start 2013 Page 79 and then page 81. */
    
+For some theory, here is a video presentation and explination about component testing using an "Ocotopus"   https://www.youtube.com/watch?v=WWY-pakm_OM   
    
-   
+The OctoUNO in action  
 Screen shot of display  
 ![DISPLAY](/ScreenShotDisplay.png)
 
