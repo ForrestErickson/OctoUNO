@@ -10,9 +10,9 @@
    Free to use. This program is designed to kill you but not guaranteed to do so.
    Date: 20210721 Rework circuits per note book Start 2013 Page 79 and then page 81.
    Date: 20210722 Got working with Proccessing DISPLAY program
-   Date: 20210723 Added SCPI like command processor for start, stop, reset and IDN. 
+   Date: 20210723 Added SCPI like command processor for start, stop, reset and IDN.
    Add version number.
-   Date: 20210924 Broke out Wink into module. Broke out Commands into module.   
+   Date: 20210924 Broke out Wink into module. Broke out Commands into module.
 */
 
 /*  An Ocotpus curve tracers sources and sinks current into a single port and plots the IV curve.
@@ -36,7 +36,8 @@
 
 
 //--------------- Includes ---------------------------
-#include "Arduino.h"
+#include <DailyStruggleButton.h>
+//#include "Arduino.h"
 #include "wink.h"
 #include "commands.h"
 
@@ -63,32 +64,25 @@ int ii = MAXPWM / 2; // Mid point
 int Vdut = 0;
 int Idut = 0;
 
+//Button debounce setup
+// Time in ms you need to hold down the button to be considered a long press
+unsigned int longPressTime = 1000;
+  
+// How many times you need to hit the button to be considered a multi-hit
+byte multiHitTarget = 2; 
+
+// How fast you need to hit all buttons to be considered a multi-hit
+unsigned int multiHitTime = 400; 
+
+// Create an instance of DailyStruggleButton
+DailyStruggleButton myButton; 
+
+
 //State of Octopus curve tracing set at start.
-extern boolean isCaptureOcotopus = false;  
+extern boolean isCaptureOcotopus = false;
 
 //String variable global
 String inputString = "";         // a String to hold incoming data
-
-//Set Wink time for BUILT IN LED for Uno or ESP32 Dev Kit on board blue LED.
-//const int HIGH_TIME_LED = 900;
-//const int LOW_TIME_LED = 100;
-//long lastLEDtime = 0;
-//long nextLEDchange = 100; //time in ms.
-
-//void wink() {
-//  //Wink the LED
-//  if (((millis() - lastLEDtime) > nextLEDchange) || (millis() < lastLEDtime)) {
-//    if (digitalRead(LED_BUILTIN) == LOW) {
-//      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-//      nextLEDchange = HIGH_TIME_LED;
-//    } else {
-//      digitalWrite(LED_BUILTIN, LOW);   // turn the LED on (HIGH is the voltage level)
-//      nextLEDchange = LOW_TIME_LED;
-//    }
-//    lastLEDtime = millis();
-//  }
-//}//end LED wink
-
 
 void captureOctopus() {
   //Curve Trace. Measure A0, A1
@@ -122,12 +116,28 @@ void setup() {
   // reserve 200 bytes for the inputString:
   inputString.reserve(200);
 
+  //Button
   pinMode(BUTTON_CAPTURE, INPUT_PULLUP);      // set
+
+    // Use set(digital pin connected to button, a callback function, type of pull-up/down) to initialise the button
+  // Choose between INT_PULL_UP, EXT_PULL_UP and EXT_PULL_DOWN
+  //myButton.set(4, buttonEvent, INT_PULL_UP);
+  myButton.set(BUTTON_CAPTURE, buttonEvent, INT_PULL_UP);
+
+  // You can enable long press to use this feature
+  myButton.enableLongPress(longPressTime);
+
+  // You can enable multi-hit to use this feature
+  myButton.enableMultiHit(multiHitTime, multiHitTarget);
+  
+
+
+  
 
   pinMode(LED_BUILTIN, OUTPUT);      // set the LED pin mode
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level) Start of setup()
 
-  //Set PWM drive pins to output.
+  //Set PWM drive pins to octopus output.
   pinMode(VccTest, OUTPUT);
   analogWrite(VccTest, 127);  //Set to mid point
   digitalWrite(LED_BUILTIN, LOW);   // end of setup()
@@ -137,17 +147,68 @@ void loop() {
   // put your main code here, to run repeatedly:
   winkLED_BUILTIN;
   //wink(); //the built in LED.
- 
+
   if (isCaptureOcotopus) {
     captureOctopus();
   }
 
   //Proccess button function
-  if (!digitalRead(BUTTON_CAPTURE)) {
-    delay(10);
-    isCaptureOcotopus = !isCaptureOcotopus;
-  }
+//  if (!digitalRead(BUTTON_CAPTURE)) {
+//    delay(100);
+//    isCaptureOcotopus = !isCaptureOcotopus;
+//  }
 
- checkCommands(); //from serial port
+  // This is needed to poll the button constantly
+  myButton.poll();
+
+  //Proccess serial commands
+  checkCommands(); 
 
 }//Loop
+
+// This function will be called whenever an event occurs.
+// We pass the name of this callback function in set().
+// It needs to take a parameter of the byte datatype.
+// This byte will indicate the event.
+// It needs to return void.
+void buttonEvent(byte btnStatus){
+
+  // We can use switch/case to run through what happens for each event
+  switch (btnStatus){
+
+    // onPress is indicated when the button is pushed down
+    case onPress:
+      Serial.println("Button Pressed");
+      break;
+
+    // onRelease is indicated when the button is let go
+    case onRelease:
+      Serial.println("Button Released");
+      isCaptureOcotopus = !isCaptureOcotopus;
+      break;
+
+    // onHold is indicated whenever the button is held down.
+    // It can be annoying so we will comment this out in this example.
+//  case onHold:
+//    Serial.println("Button Long Pressed");
+//    break;
+
+    // onLongPress is indidcated when you hold onto the button 
+    // more than longPressTime in milliseconds
+    case onLongPress:
+      Serial.print("Buttong Long Pressed For ");
+      Serial.print(longPressTime);
+      Serial.println("ms");
+      break;
+
+    // onMultiHit is indicated when you hit the button
+    // multiHitTarget times within multihitTime in milliseconds
+    case onMultiHit:
+      Serial.print("Button Pressed ");
+      Serial.print(multiHitTarget);
+      Serial.print(" times in ");
+      Serial.print(multiHitTime);
+      Serial.println("ms");
+      break;
+  }
+}// end buttonEvent
