@@ -13,9 +13,10 @@
    Date: 20210723 Added SCPI like command processor for start, stop, reset and IDN.
    Add version number.
    Date: 20210924 Broke out Wink into module. Broke out Commands into module.
+   Date: 20210924 Debounce the start and stop button with DailyStruggleButton library. NICE!.
 */
 
-/*  An Ocotpus curve tracers sources and sinks current into a single port and plots the IV curve.
+/*  Details: An Ocotpus curve tracers sources and sinks current into a two pin single port and plots the IV curve.
     If the DUT is and IC we are typicaly typicaly interested in probing the ESD input protection diodes.
     We typically test the device unpowered with VCC shorted to VSS (GND) and we probed with a positive and negative current limited voltage ramps.
 
@@ -33,13 +34,12 @@
 */
 
 // Import required libraries
-
-
 //--------------- Includes ---------------------------
-#include <DailyStruggleButton.h>
+#include <DailyStruggleButton.h> //Loaded from Arduino libray manager. See also: https://github.com/cygig/DailyStruggleButton
 //#include "Arduino.h"
 #include "wink.h"
 #include "commands.h"
+#include "buttons.h"
 
 //Some program constants
 extern const String COMPANY = "Amused Scientist";
@@ -47,14 +47,15 @@ extern const String MODEL_NAME = "OctoUNO";
 extern const String VERSION = "0.0.3";
 
 //Hardware setup
-const int VccTest = 5;    //Use PWM output 5, 980Hz.
-const int BUTTON_CAPTURE = 2;   // Button to GND.
+#define VccTest  5    //Use PWM output 5, 980Hz.
+extern const int BUTTON_CAPTURE = 2;   // Button to GND.
 extern const int RESET_PIN = 12;   // To Drive HW Reset.
 
 const int VCC = 5;  //Volts
 const int REQ = 5000;   //REQ is the Rthevenin of 10K // 10K
 const int MAXPWM = 255;
 const int STEPSIZE = 1;
+const long SAMPLEDELAYTIMEuS = 300;  //Gives fast curver trace.
 
 //const long BAUD =  115200;  // Slower but compatible with other deveopment.
 const long BAUD =  1000000;  // For fast curve tracing.
@@ -64,19 +65,12 @@ int ii = MAXPWM / 2; // Mid point
 int Vdut = 0;
 int Idut = 0;
 
-//Button debounce setup
-// Time in ms you need to hold down the button to be considered a long press
-unsigned int longPressTime = 1000;
-  
-// How many times you need to hit the button to be considered a multi-hit
-byte multiHitTarget = 2; 
-
-// How fast you need to hit all buttons to be considered a multi-hit
-unsigned int multiHitTime = 400; 
-
 // Create an instance of DailyStruggleButton
 DailyStruggleButton myButton; 
 
+extern unsigned int longPressTime;
+extern unsigned int multiHitTime;
+extern byte multiHitTarget;
 
 //State of Octopus curve tracing set at start.
 extern boolean isCaptureOcotopus = false;
@@ -105,8 +99,7 @@ void captureOctopus() {
   if (ii > MAXPWM) {
     ii = 0;
   }
-  delayMicroseconds(300);     // This makes a display good for oscilliscope.
-  //  delayMicroseconds(2000);     // Sweep on Display is notacibly slow.
+  delayMicroseconds(SAMPLEDELAYTIMEuS);     // This makes a display good for oscilliscope.
 }//captureOcotpus
 
 
@@ -165,50 +158,3 @@ void loop() {
   checkCommands(); 
 
 }//Loop
-
-// This function will be called whenever an event occurs.
-// We pass the name of this callback function in set().
-// It needs to take a parameter of the byte datatype.
-// This byte will indicate the event.
-// It needs to return void.
-void buttonEvent(byte btnStatus){
-
-  // We can use switch/case to run through what happens for each event
-  switch (btnStatus){
-
-    // onPress is indicated when the button is pushed down
-    case onPress:
-      Serial.println("Button Pressed");
-      break;
-
-    // onRelease is indicated when the button is let go
-    case onRelease:
-      Serial.println("Button Released");
-      isCaptureOcotopus = !isCaptureOcotopus;
-      break;
-
-    // onHold is indicated whenever the button is held down.
-    // It can be annoying so we will comment this out in this example.
-//  case onHold:
-//    Serial.println("Button Long Pressed");
-//    break;
-
-    // onLongPress is indidcated when you hold onto the button 
-    // more than longPressTime in milliseconds
-    case onLongPress:
-      Serial.print("Buttong Long Pressed For ");
-      Serial.print(longPressTime);
-      Serial.println("ms");
-      break;
-
-    // onMultiHit is indicated when you hit the button
-    // multiHitTarget times within multihitTime in milliseconds
-    case onMultiHit:
-      Serial.print("Button Pressed ");
-      Serial.print(multiHitTarget);
-      Serial.print(" times in ");
-      Serial.print(multiHitTime);
-      Serial.println("ms");
-      break;
-  }
-}// end buttonEvent
