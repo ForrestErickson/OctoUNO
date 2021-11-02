@@ -35,6 +35,12 @@ void checkCommands() {
     //Serial.println(inputString);    //For debug of command strings
     inputString.toUpperCase();
 
+    if ( inputString.startsWith(CLS)) {
+      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+      Serial.println("Clear command status.");
+      //To do  Clear ?
+    }
+
     if ( inputString.startsWith(START)) {
       Serial.println("Got command start!");
       isCaptureOcotopus = true;

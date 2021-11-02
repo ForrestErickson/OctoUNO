@@ -5,13 +5,17 @@
  License: Dedicated to the public domain.
  Free to use. This program is designed to kill you but not guaranteed to do so.
  Date: 20210723 Added Mouse control and SCPI like command processor for start, stop, reset and IDN.  
+ Date: 20211101 Added *CLS command. Add 'q' to send reset command to instrument and user instructions.  Incremet to Rev 0.0.3.  
  */
+
+//final int COMPORTNUM = 4;    //Change the port number as necessary
+final int COMPORTNUM = 5;    //Change the port number as necessary
 
 import processing.serial.*;
 
 String COMPANY = "Amused Scientist";
 String MODELNAME = "OctoUNO";
-String VERSION = "0.0.2";
+String VERSION = "0.0.3";
 
 
 int lf = 10;    // Linefeed in ASCII
@@ -32,7 +36,7 @@ void setup() {
   // List all the available serial ports
   printArray(Serial.list());
   // Open the port you are using at the rate you want:
-  myPort = new Serial(this, Serial.list()[4], BAUDRATE);  //Arduino
+  myPort = new Serial(this, Serial.list()[COMPORTNUM], BAUDRATE);  //Arduino
   myPort.clear();
   // Throw out the first reading, in case we started reading 
   // in the middle of a string from the sender.
@@ -80,14 +84,16 @@ void draw() {
 
 void menuDisplay() {  
   textFont(fBig);
-  text("OctoUNO", 30, 20);
+  text("OctoUNO", 10, 20);
   textFont(f);
   text("Left Mouse Start", 30, 40);
   text("Right Mouse Stop", 30, 60);
   text("Escape to exit", 30, 80);
-  text("Any key to erase", 30, 100);
+  text("'r,g,b' background", 30, 100);
+  text("'q' to reset", 30, 120);
+  text("Any key to erase", 30, 140);
   textFont(fFoot);
-  text(COMPANY + ", " + MODELNAME + ", Version: " + VERSION, 10, 590);
+  text(COMPANY + ", " + MODELNAME + ", Display Version: " + VERSION, 10, 590);
   text("By Forrest Erickson", 500, 590);
 }//menuDisplay
 

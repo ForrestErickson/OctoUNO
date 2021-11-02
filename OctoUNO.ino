@@ -14,7 +14,11 @@
    Add version number.
    Date: 20210924 Broke out Wink into module. Broke out Commands into module.
    Date: 20210924 Debounce the start and stop button with DailyStruggleButton library. NICE!.
-*/
+   Date: 20210311 Change button capture from D2 to D3 to match the KiCAD SMD PCB Version 0.0.1.
+   Date: 20211101 Add delay at bottom of ramp so the falling edge at output of the filter gets low.
+   Date: 20211101 Impliment minimal CLS command.
+   Date: 20211101 Change version to 4.  
+   */
 
 /*  Details: An Ocotpus curve tracers sources and sinks current into a two pin single port and plots the IV curve.
     If the DUT is and IC we are typicaly typicaly interested in probing the ESD input protection diodes.
@@ -44,11 +48,12 @@
 //Some program constants
 extern const String COMPANY = "Amused Scientist";
 extern const String MODEL_NAME = "OctoUNO";
-extern const String VERSION = "0.0.3";
+extern const String VERSION = "0.0.4";    //Make saw tooth go lower.
 
 //Hardware setup
 #define VccTest  5    //Use PWM output 5, 980Hz.
-extern const int BUTTON_CAPTURE = 2;   // Button to GND.
+//extern const int BUTTON_CAPTURE = 2;   // Prototype, ExpressPCB Button to GND.
+extern const int BUTTON_CAPTURE = 3;   // KiCAD board Button to GND.
 extern const int RESET_PIN = 12;   // To Drive HW Reset.
 
 const int VCC = 5;  //Volts
@@ -97,7 +102,9 @@ void captureOctopus() {
   analogWrite(VccTest, ii);
   ii = ii + STEPSIZE;
   if (ii > MAXPWM) {
-    ii = 0;
+    ii = 1;
+    analogWrite(VccTest, ii);
+    delay(50); //Delay to let saw tooth go low.
   }
   delayMicroseconds(SAMPLEDELAYTIMEuS);     // This makes a display good for oscilliscope.
 }//captureOcotpus
@@ -133,6 +140,7 @@ void setup() {
   //Set PWM drive pins to octopus output.
   pinMode(VccTest, OUTPUT);
   analogWrite(VccTest, 127);  //Set to mid point
+//  Serial.println("Starting OcotUNO now.");      //For troubleshooting.
   digitalWrite(LED_BUILTIN, LOW);   // end of setup()
 }
 
