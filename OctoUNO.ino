@@ -18,6 +18,7 @@
    Date: 20211101 Add delay at bottom of ramp so the falling edge at output of the filter gets low.
    Date: 20211101 Impliment minimal CLS command.
    Date: 20211101 Change version to 4.  
+   Date: 20211103 Change version to 5.  Add offset to zero current measurement.
    */
 
 /*  Details: An Ocotpus curve tracers sources and sinks current into a two pin single port and plots the IV curve.
@@ -48,7 +49,7 @@
 //Some program constants
 extern const String COMPANY = "Amused Scientist";
 extern const String MODEL_NAME = "OctoUNO";
-extern const String VERSION = "0.0.4";    //Make saw tooth go lower.
+extern const String VERSION = "0.0.5";    //Zero current measruement.
 
 //Hardware setup
 #define VccTest  5    //Use PWM output 5, 980Hz.
@@ -57,6 +58,9 @@ extern const int BUTTON_CAPTURE = 3;   // KiCAD board Button to GND.
 extern const int RESET_PIN = 12;   // To Drive HW Reset.
 
 const int VCC = 5;  //Volts
+const int VMID = 512; //Ideal midpoint as read by ADC.
+int VOFFSET = 7; //Ofsset to midpoint as read by ADC.  For PCB #2.
+
 const int REQ = 5000;   //REQ is the Rthevenin of 10K // 10K
 const int MAXPWM = 255;
 const int STEPSIZE = 1;
@@ -89,7 +93,7 @@ void captureOctopus() {
   int VdutPlus = analogRead(A0);
   int VdutMinus = analogRead(A1);
   Vdut = VdutPlus - VdutMinus;
-  Idut = (VdutMinus - 512); //uAmps
+  Idut = (VdutMinus - (VMID+VOFFSET)); //uAmps
 
   //  Serial.print(VdutPlus);
   Serial.print(Vdut);
