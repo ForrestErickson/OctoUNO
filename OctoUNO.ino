@@ -19,6 +19,7 @@
    Date: 20211101 Impliment minimal CLS command.
    Date: 20211101 Change version to 4.  
    Date: 20211103 Change version to 5.  Add offset to zero current measurement.
+   Date: 20211103 Change version to 6.  Fixed call to wink in loop.
    */
 
 /*  Details: An Ocotpus curve tracers sources and sinks current into a two pin single port and plots the IV curve.
@@ -49,7 +50,7 @@
 //Some program constants
 extern const String COMPANY = "Amused Scientist";
 extern const String MODEL_NAME = "OctoUNO";
-extern const String VERSION = "0.0.5";    //Zero current measruement.
+extern const String VERSION = "0.0.6";    //Fix call to wink.
 
 //Hardware setup
 #define VccTest  5    //Use PWM output 5, 980Hz.
@@ -150,7 +151,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  winkLED_BUILTIN;
+  winkLED_BUILTIN();
   //wink(); //the built in LED.
 
   if (isCaptureOcotopus) {
