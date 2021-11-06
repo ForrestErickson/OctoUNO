@@ -20,6 +20,7 @@
    Date: 20211101 Change version to 4.  
    Date: 20211103 Change version to 5.  Add offset to zero current measurement.
    Date: 20211103 Change version to 6.  Fixed call to wink in loop.
+   Date: 20211105 Change version to 7.  Send Idut as uA on serial port. Remove dead button code.
    */
 
 /*  Details: An Ocotpus curve tracers sources and sinks current into a two pin single port and plots the IV curve.
@@ -50,7 +51,7 @@
 //Some program constants
 extern const String COMPANY = "Amused Scientist";
 extern const String MODEL_NAME = "OctoUNO";
-extern const String VERSION = "0.0.6";    //Fix call to wink.
+extern const String VERSION = "0.0.7";    //Scale Idut for uA.
 
 //Hardware setup
 #define VccTest  5    //Use PWM output 5, 980Hz.
@@ -60,7 +61,8 @@ extern const int RESET_PIN = 12;   // To Drive HW Reset.
 
 const int VCC = 5;  //Volts
 const int VMID = 512; //Ideal midpoint as read by ADC.
-int VOFFSET = 7; //Ofsset to midpoint as read by ADC.  For PCB #2.
+int VOFFSET = 1; //Ofsset to midpoint as read by ADC.  For PCB #1.
+//int VOFFSET = 7; //Ofsset to midpoint as read by ADC.  For PCB #2.
 
 const int REQ = 5000;   //REQ is the Rthevenin of 10K // 10K
 const int MAXPWM = 255;
@@ -94,16 +96,15 @@ void captureOctopus() {
   int VdutPlus = analogRead(A0);
   int VdutMinus = analogRead(A1);
   Vdut = VdutPlus - VdutMinus;
-  Idut = (VdutMinus - (VMID+VOFFSET)); //uAmps
+//  Idut = (VdutMinus - (VMID+VOFFSET)); //uAmps
+  Idut = int(((VdutMinus - (VMID+VOFFSET))*((5*1000000)/1024)/REQ)); //I=V/Req *1000000 = ADC * (5/1024)/5000 *1000000 / REQ for uA
 
-  //  Serial.print(VdutPlus);
+  //The Processing display program expects two comma seperated integers
   Serial.print(Vdut);
   Serial.print(", ");
   Serial.println(Idut);
-  //  Serial.println(Idut-Vdut);
 
   //Ramp VccTest
-  //Serial.println(ii);
   analogWrite(VccTest, ii);
   ii = ii + STEPSIZE;
   if (ii > MAXPWM) {
@@ -134,10 +135,6 @@ void setup() {
 
   // You can enable multi-hit to use this feature
   myButton.enableMultiHit(multiHitTime, multiHitTarget);
-  
-
-
-  
 
   pinMode(LED_BUILTIN, OUTPUT);      // set the LED pin mode
   digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level) Start of setup()
@@ -147,22 +144,15 @@ void setup() {
   analogWrite(VccTest, 127);  //Set to mid point
 //  Serial.println("Starting OcotUNO now.");      //For troubleshooting.
   digitalWrite(LED_BUILTIN, LOW);   // end of setup()
-}
+}// end setup
 
 void loop() {
   // put your main code here, to run repeatedly:
-  winkLED_BUILTIN();
-  //wink(); //the built in LED.
+  winkLED_BUILTIN(); //the built in LED.
 
   if (isCaptureOcotopus) {
     captureOctopus();
   }
-
-  //Proccess button function
-//  if (!digitalRead(BUTTON_CAPTURE)) {
-//    delay(100);
-//    isCaptureOcotopus = !isCaptureOcotopus;
-//  }
 
   // This is needed to poll the button constantly
   myButton.poll();
@@ -170,4 +160,4 @@ void loop() {
   //Proccess serial commands
   checkCommands(); 
 
-}//Loop
+}//end loop
