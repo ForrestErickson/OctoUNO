@@ -9,6 +9,7 @@
  Date: 20211103 Rev 0.0.4. Parameterize margins for text placement. Enlarge display for full dynamic range. Add tick marks and axis lables.   
  Date: 20211105 Rev 0.0.5. Calibrate current scale. Add mouse cursor report for V and I. Move program name ect. to window.
  Date: 20211106 Auto format.
+ Date: 20211106 Set cursor as cross.
  */
 
 //final int COMPORTNUM = 4;    //Change the port number as necessary
@@ -73,6 +74,7 @@ void setup() {
   fFoot = createFont("Arial", 10, true);     // Create Font for smaller text on footer 
 
   stroke(153);
+  cursor(CROSS);
   background(myBackground);
 }
 
