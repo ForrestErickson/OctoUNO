@@ -7,6 +7,8 @@
  Date: 20210723 Added Mouse control and SCPI like command processor for start, stop, reset and IDN.  
  Date: 20211101 Added *CLS command. Add 'q' to send reset command to instrument and user instructions.  Incremet to Rev 0.0.3.  
  Date: 20211103 Rev 0.0.4. Parameterize margins for text placement. Enlarge display for full dynamic range. Add tick marks and axis lables.   
+ Date: 20211105 Rev 0.0.5. Calibrate current scale. Add mouse cursor report for V and I. Move program name ect. to window.
+ Date: 20211106 Auto format text. 
  */
 
 //final int COMPORTNUM = 4;    //Change the port number as necessary
@@ -33,15 +35,17 @@ final int TICK_LEN = 2;
 //final int MINOR_TICK_LEN = 1; 
 final color myBLACK = color(0, 0, 0);
 final color myGRAY = color(128, 128, 128);
+final color myWHITE = color(255, 255, 255);
 color myBackground = myBLACK;  //Start out gray.
 final int VOLTAGE_SCALE = 1024/5 ; //Volts
-final int CURRENT_SCALE = 1024/5 ;  //uAmps
+//final int CURRENT_SCALE = 1024/5 ;  //uAmps
+final int CURRENT_SCALE = 100 ;  //uAmps
 
-boolean gotKey = false;
+boolean gotKey = false;          //Key flag used to clear display.
 
 PFont f;                          // Declare regular body text PFont variable
-PFont fBig;                          // Declare heading PFont variable
-PFont fFoot;                          // Declare footer PFont variable
+PFont fBig;                       // Declare heading PFont variable
+PFont fFoot;                      // Declare footer PFont variable
 
 //Margins for text relative to edges
 final int TOP_MARGIN = 20;
@@ -63,6 +67,7 @@ void setup() {
 
   //Display setup. The Arduino ADC has a range of 1023 split in half for the measurements. 
   size(800, 800);
+  surface.setTitle(COMPANY + ", " + MODELNAME + " Display, Version: " + VERSION);
   f = createFont("Arial", 15, true);     // Create Font normal text.
   fBig = createFont("Arial", 20, true);     // Create Font for large text on heading 
   fFoot = createFont("Arial", 10, true);     // Create Font for smaller text on footer 
@@ -75,7 +80,7 @@ void setup() {
 void draw() {
   menuDisplay();
   axisDraw();
-
+  
   //PLot curve trace points
   while ( (myPort.available() > 0)) {
     myString = myPort.readStringUntil(lf);
@@ -110,8 +115,15 @@ void menuDisplay() {
   text("'r,g,b' background", RIGHT_MARGIN*2, TOP_MARGIN*5);
   text("'q' to reset", RIGHT_MARGIN*2, TOP_MARGIN*6);
   text("Any key to erase", RIGHT_MARGIN*2, TOP_MARGIN*7);
-  textFont(fFoot);
-  text(COMPANY + ", " + MODELNAME + ", Display Version: " + VERSION, RIGHT_MARGIN, (myHeight-BOTTOM_MARGIN));
+  
+  //Bottom of display
+  textFont(fFoot);  
+  fill(myBackground);                                    //Erase previouse mouse location.
+  rect(RIGHT_MARGIN-1, (myHeight-3*BOTTOM_MARGIN), 250, (myHeight-1*BOTTOM_MARGIN));
+  fill(myWHITE);
+  text("x= " + int(mouseX-(myWidth/2)) + " y= " + int(myHeight/2-mouseY), RIGHT_MARGIN, (myHeight-2*BOTTOM_MARGIN));
+  text("xVolts= " + nf((float(mouseX-(myWidth/2))/VOLTAGE_SCALE),0,3) + " yuA= " + int(myHeight/2-mouseY), RIGHT_MARGIN, (myHeight-1*BOTTOM_MARGIN));
+  //text(COMPANY + ", " + MODELNAME + ", Display Version: " + VERSION, RIGHT_MARGIN, (myHeight-BOTTOM_MARGIN));
   text("By Forrest Erickson", myWidth-100, (myHeight-10));
 }//menuDisplay
 
@@ -132,11 +144,16 @@ void axisDraw() {
   line(0, -myHeight, 0, myHeight); //Vertical axis
   //Minor vertical axis
   text("Current", RIGHT_MARGIN, -(myHeight/2-TOP_MARGIN));                              //Scale Lable
-  line(-(myWidth/100+TICK_LEN), -CURRENT_SCALE, (myWidth/100+TICK_LEN), -CURRENT_SCALE); //Vertical mark
-  text("-500uA", -(RIGHT_MARGIN+3), (CURRENT_SCALE-1));                              //Scale Lable
+  text("-200uA", -(RIGHT_MARGIN+3), (2*CURRENT_SCALE-1));                              //Scale Lable
+  line(-(myWidth/100+TICK_LEN), 2*CURRENT_SCALE, (myWidth/100+TICK_LEN), 2*CURRENT_SCALE); //Vertical mark
+  text("-100uA", -(RIGHT_MARGIN+3), (CURRENT_SCALE-1));                              //Scale Lable
   line(-(myWidth/100+TICK_LEN), CURRENT_SCALE, (myWidth/100+TICK_LEN), CURRENT_SCALE); //Vertical mark
-  text("+500uA", -(RIGHT_MARGIN+3), -(CURRENT_SCALE+1));                              //Scale Lable
-  
+
+  text("+100uA", -(RIGHT_MARGIN+3), -(CURRENT_SCALE+1));                              //Scale Lable
+  line(-(myWidth/100+TICK_LEN), -CURRENT_SCALE, (myWidth/100+TICK_LEN), -CURRENT_SCALE); //Vertical mark
+  text("+200uA", -(RIGHT_MARGIN+3), (-2*CURRENT_SCALE-1));                              //Scale Lable
+  line(-(myWidth/100+TICK_LEN), -2*CURRENT_SCALE, (myWidth/100+TICK_LEN), -2*CURRENT_SCALE); //Vertical mark
+
   stroke(32);
   popMatrix();
 }//axisDraw
