@@ -2,6 +2,8 @@
    Proccess serial port commands
    By: Forrest Lee Erickson
    Date: 20210924
+   
+   Date: 20211106 Auto format.
 */
 
 //--------------- Includes ---------------------------
@@ -10,7 +12,7 @@
 
 //external variables
 extern String inputString ;         // a String to hold incoming data
-extern boolean isCaptureOcotopus ;  
+extern boolean isCaptureOcotopus ;
 extern int RESET_PIN;
 extern const String COMPANY;
 extern const String MODEL_NAME;

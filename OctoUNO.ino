@@ -17,11 +17,12 @@
    Date: 20210311 Change button capture from D2 to D3 to match the KiCAD SMD PCB Version 0.0.1.
    Date: 20211101 Add delay at bottom of ramp so the falling edge at output of the filter gets low.
    Date: 20211101 Impliment minimal CLS command.
-   Date: 20211101 Change version to 4.  
+   Date: 20211101 Change version to 4.
    Date: 20211103 Change version to 5.  Add offset to zero current measurement.
    Date: 20211103 Change version to 6.  Fixed call to wink in loop.
    Date: 20211105 Change version to 7.  Send Idut as uA on serial port. Remove dead button code.
-   */
+   Date: 20211106 Auto format.
+*/
 
 /*  Details: An Ocotpus curve tracers sources and sinks current into a two pin single port and plots the IV curve.
     If the DUT is and IC we are typicaly typicaly interested in probing the ESD input protection diodes.
@@ -78,7 +79,7 @@ int Vdut = 0;
 int Idut = 0;
 
 // Create an instance of DailyStruggleButton
-DailyStruggleButton myButton; 
+DailyStruggleButton myButton;
 
 extern unsigned int longPressTime;
 extern unsigned int multiHitTime;
@@ -96,8 +97,8 @@ void captureOctopus() {
   int VdutPlus = analogRead(A0);
   int VdutMinus = analogRead(A1);
   Vdut = VdutPlus - VdutMinus;
-//  Idut = (VdutMinus - (VMID+VOFFSET)); //uAmps
-  Idut = int(((VdutMinus - (VMID+VOFFSET))*((5*1000000)/1024)/REQ)); //I=V/Req *1000000 = ADC * (5/1024)/5000 *1000000 / REQ for uA
+  //  Idut = (VdutMinus - (VMID+VOFFSET)); //uAmps
+  Idut = int(((VdutMinus - (VMID + VOFFSET)) * ((5 * 1000000) / 1024) / REQ)); //I=V/Req *1000000 = ADC * (5/1024)/5000 *1000000 / REQ for uA
 
   //The Processing display program expects two comma seperated integers
   Serial.print(Vdut);
@@ -125,7 +126,7 @@ void setup() {
   //Button
   pinMode(BUTTON_CAPTURE, INPUT_PULLUP);      // set
 
-    // Use set(digital pin connected to button, a callback function, type of pull-up/down) to initialise the button
+  // Use set(digital pin connected to button, a callback function, type of pull-up/down) to initialise the button
   // Choose between INT_PULL_UP, EXT_PULL_UP and EXT_PULL_DOWN
   //myButton.set(4, buttonEvent, INT_PULL_UP);
   myButton.set(BUTTON_CAPTURE, buttonEvent, INT_PULL_UP);
@@ -142,7 +143,7 @@ void setup() {
   //Set PWM drive pins to octopus output.
   pinMode(VccTest, OUTPUT);
   analogWrite(VccTest, 127);  //Set to mid point
-//  Serial.println("Starting OcotUNO now.");      //For troubleshooting.
+  //  Serial.println("Starting OcotUNO now.");      //For troubleshooting.
   digitalWrite(LED_BUILTIN, LOW);   // end of setup()
 }// end setup
 
@@ -158,6 +159,6 @@ void loop() {
   myButton.poll();
 
   //Proccess serial commands
-  checkCommands(); 
+  checkCommands();
 
 }//end loop

@@ -8,7 +8,7 @@
  Date: 20211101 Added *CLS command. Add 'q' to send reset command to instrument and user instructions.  Incremet to Rev 0.0.3.  
  Date: 20211103 Rev 0.0.4. Parameterize margins for text placement. Enlarge display for full dynamic range. Add tick marks and axis lables.   
  Date: 20211105 Rev 0.0.5. Calibrate current scale. Add mouse cursor report for V and I. Move program name ect. to window.
- Date: 20211106 Auto format text. 
+ Date: 20211106 Auto format.
  */
 
 //final int COMPORTNUM = 4;    //Change the port number as necessary
@@ -80,7 +80,7 @@ void setup() {
 void draw() {
   menuDisplay();
   axisDraw();
-  
+
   //PLot curve trace points
   while ( (myPort.available() > 0)) {
     myString = myPort.readStringUntil(lf);
@@ -115,14 +115,14 @@ void menuDisplay() {
   text("'r,g,b' background", RIGHT_MARGIN*2, TOP_MARGIN*5);
   text("'q' to reset", RIGHT_MARGIN*2, TOP_MARGIN*6);
   text("Any key to erase", RIGHT_MARGIN*2, TOP_MARGIN*7);
-  
+
   //Bottom of display
   textFont(fFoot);  
   fill(myBackground);                                    //Erase previouse mouse location.
   rect(RIGHT_MARGIN-1, (myHeight-3*BOTTOM_MARGIN), 250, (myHeight-1*BOTTOM_MARGIN));
   fill(myWHITE);
   text("x= " + int(mouseX-(myWidth/2)) + " y= " + int(myHeight/2-mouseY), RIGHT_MARGIN, (myHeight-2*BOTTOM_MARGIN));
-  text("xVolts= " + nf((float(mouseX-(myWidth/2))/VOLTAGE_SCALE),0,3) + " yuA= " + int(myHeight/2-mouseY), RIGHT_MARGIN, (myHeight-1*BOTTOM_MARGIN));
+  text("xVolts= " + nf((float(mouseX-(myWidth/2))/VOLTAGE_SCALE), 0, 3) + " yuA= " + int(myHeight/2-mouseY), RIGHT_MARGIN, (myHeight-1*BOTTOM_MARGIN));
   //text(COMPANY + ", " + MODELNAME + ", Display Version: " + VERSION, RIGHT_MARGIN, (myHeight-BOTTOM_MARGIN));
   text("By Forrest Erickson", myWidth-100, (myHeight-10));
 }//menuDisplay
@@ -140,7 +140,7 @@ void axisDraw() {
   text("-1", -(VOLTAGE_SCALE), TOP_MARGIN);                              //Scale Lable
   line(-VOLTAGE_SCALE, -(myHeight/100+TICK_LEN), -VOLTAGE_SCALE, (myHeight/100+TICK_LEN)); //Horizontal mark
   text("+1", VOLTAGE_SCALE, TOP_MARGIN);                              //Scale Lable
-  
+
   line(0, -myHeight, 0, myHeight); //Vertical axis
   //Minor vertical axis
   text("Current", RIGHT_MARGIN, -(myHeight/2-TOP_MARGIN));                              //Scale Lable
