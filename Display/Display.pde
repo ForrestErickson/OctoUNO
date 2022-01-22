@@ -12,8 +12,8 @@
  Date: 20211106 Set cursor as cross.
  */
 
-//final int COMPORTNUM = 4;    //Change the port number as necessary
-final int COMPORTNUM = 5;    //Change the port number as necessary
+final int COMPORTNUM = 4;    //Change the port number as necessary
+//final int COMPORTNUM = 5;    //Change the port number as necessary
 
 import processing.serial.*;
 
@@ -53,6 +53,10 @@ final int TOP_MARGIN = 20;
 final int RIGHT_MARGIN = 10;
 final int LEFT_MARGIN = 10;
 final int BOTTOM_MARGIN = 10;
+
+//Serial Timing Measurement
+int serialTimeStart = 0;
+int serialTimeStop = 0;
 
 
 void setup() {
@@ -95,6 +99,8 @@ void draw() {
       //      println(int(myPoints[1]));
       if (myPoints.length == 2) { //Plot only if two elements to select only XY data.
         circle(int(myPoints[0])+myWidth/2, myHeight/2-int(trim(myPoints[1])), DATA_SIZE);
+      }else {
+        println("Serial elaps time = " + int(millis()-serialTimeStart));
       }
     }
   }//end PLot curve trace points
@@ -116,7 +122,8 @@ void menuDisplay() {
   text("Escape to exit", RIGHT_MARGIN*2, TOP_MARGIN*4);
   text("'r,g,b' background", RIGHT_MARGIN*2, TOP_MARGIN*5);
   text("'q' to reset", RIGHT_MARGIN*2, TOP_MARGIN*6);
-  text("Any key to erase", RIGHT_MARGIN*2, TOP_MARGIN*7);
+  text("'t' to trigger (start)", RIGHT_MARGIN*2, TOP_MARGIN*7);
+  text("Any key to erase", RIGHT_MARGIN*2, TOP_MARGIN*8);
 
   //Bottom of display
   textFont(fFoot);  
